@@ -1,5 +1,9 @@
 SpeechRecognition
+streamlit
 pyttsx3
 PyAudio
-sounddevice
-wavio
+streamlit-option-menu
+google-generativeai
+python-dotenv
+langchain
+langchain_google_genai
