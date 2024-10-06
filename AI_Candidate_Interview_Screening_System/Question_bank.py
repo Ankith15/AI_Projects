@@ -23,18 +23,24 @@ def generate_next_question(last_response):
 
 # Function to score the user's answer (out of 10)
 def evaluate_answer(answer):
-    score = len(answer.split()) // 5  # Simple logic, adjust based on your requirements
+    score = len(answer.split()) // 5  # Simple logic: 1 point for every 5 words
     return min(score, 10)
 
 # Function to handle the interview flow
-def handle_interview(user_answer, last_question, total_score):
+def handle_interview(user_answer, last_question, total_score, question_count):
+    if question_count >= 4:
+        return None, total_score  # Stop after 4 questions
+    
+    # Score the user's answer
     score = evaluate_answer(user_answer)
     total_score += score
 
+    # Generate the next question based on the user's answer
     next_question = generate_next_question(user_answer)
-    return next_question, score, total_score
+
+    return next_question, total_score
 
 # Initialization function to start the interview
 def start_interview():
     initial_question = "Please introduce yourself."
-    return initial_question, 0  # Start with a score of 0
+    return initial_question, 0, 0  # Start with 0 score and 0 questions asked
