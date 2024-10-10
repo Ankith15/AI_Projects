@@ -21,30 +21,49 @@ def data_science_page():
     st.title("Data Science Interview Questions")
     st.write('Please answer the questions carefully.')
 
+    # Initialize session state variables if not already set
     if 'total_score' not in st.session_state:
-        st.session_state.current_question, st.session_state.total_score = start_interview()
+        st.session_state.current_question, st.session_state.total_score, st.session_state.question_count = start_interview()
 
     # Display the current question
-    st.write(st.session_state.current_question)
+    st.write(f"Question: {st.session_state.current_question}")
 
     # Get user's audio response
     user_answer = get_audio()
     st.write(f"Your answer: {user_answer}")
 
-    # Get the next question based on the user's answer
+    # Button to submit the answer
     if st.button("Submit Answer"):
-        next_question, score, st.session_state.total_score = handle_interview(user_answer, st.session_state.current_question, st.session_state.total_score)
-        st.write(f"Score for this answer: {score}/10")
-        st.session_state.current_question = next_question
+        # Check if fewer than 4 questions have been asked
+        if st.session_state.question_count < 4:
+            # Call the handle_interview function to process the answer and fetch the next question
+            next_question, new_total_score = handle_interview(
+                user_answer, 
+                st.session_state.current_question, 
+                st.session_state.total_score, 
+                st.session_state.question_count
+            )
 
-        # Display the next question or overall rank after 4 questions
-        if st.session_state.total_score >= 40:  # Assuming 10 points max for each question
-            st.write(f"Overall Rank: {st.session_state.total_score}/40")
+            # Update session state
+            st.session_state.total_score = new_total_score
+            st.session_state.question_count += 1
+
+            if next_question is not None and next_question != st.session_state.current_question:
+                # Update to the next question
+                st.session_state.current_question = next_question
+                st.write(f"Next Question: {st.session_state.current_question}")
+            else:
+                # If no more questions, end the interview
+                st.write(f"Interview Completed! Your total score: {st.session_state.total_score}/40")
+
         else:
-            st.write(st.session_state.current_question)
+            # End interview after 4 questions
+            st.write(f"Interview Completed! Your total score: {st.session_state.total_score}/40")
 
+    # Option to go back to home
     if st.button("Back"):
         st.session_state.page = "Home"
+
 
 
 # Machine Learning interview page
