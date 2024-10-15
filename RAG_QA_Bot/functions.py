@@ -3,11 +3,14 @@ import re
 from io import BytesIO
 from typing import Tuple, List
 import pickle
+import cohere
 
 
 from pypdf import PdfReader
 from langchain.docstore.document import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.vectorstores.faiss import FAISS
+
 
 def pdf_parser(file: BytesIO,filename:str) -> Tuple[List[str],str]:
     pdf = PdfReader(file)
@@ -46,4 +49,23 @@ def text_to_docs(text:List[str],filename:str) ->List[Document]:
             doc.metadata['source'] = f"{doc.metadata['page']}-{doc.metadata["chunk"]}"
             doc.metadata['filename'] = filename
     return doc_chunk
+
+
+def doc_to_index(docs, cohere_api_key):
+    co = cohere.Client(cohere_api_key) 
+    
+    embeddings = co.embed(texts=[doc.page_content for doc in docs]).embeddings  
+    
+    index = FAISS.from_documents(docs, embeddings)  
+    return index
+
+
+def get_index_for_pdf(pdf_files, pdf_names, cohere_api_key):
+    documents = []
+    for pdf_file, pdf_name in zip(pdf_files, pdf_names):
+        text, filename = pdf_parser(BytesIO(pdf_file), pdf_name)
+        documents = documents + text_to_docs(text, filename)
+    
+    index = doc_to_index(documents, cohere_api_key) 
+    return index
 
