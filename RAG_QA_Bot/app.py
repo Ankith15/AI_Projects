@@ -1,20 +1,22 @@
 import streamlit as st
-from functions import get_index_for_pdf
-from langchain.llms import cohere
+from functions import get_index_for_pdf, CohereEmbeddings  # Ensure you have the correct imports
 import os
 from dotenv import load_dotenv
-import os
+from langchain_community.llms import Cohere
 
 # Load environment variables from .env file
 load_dotenv()
-# Load Coher
-# e API key
-st.title("RAG QA ChatBot")
-cohere_api = os.getenv("Cohere_api")
 
-@st.cache_data
+st.title("RAG QA ChatBot")
+COHERE_API_KEY = os.getenv("Cohere_api")
+
+# Initialize Cohere embeddings using the custom class from functions.py
+embedding_function = CohereEmbeddings(COHERE_API_KEY)
+
+@st.cache_resource
 def create_vectordb(files, filenames):
-    return get_index_for_pdf([file.getvalue() for file in files], filenames, cohere_api)
+    # Use the embedding_function here correctly
+    return get_index_for_pdf([file.getvalue() for file in files], filenames, COHERE_API_KEY)
 
 # File upload
 pdf_files = st.file_uploader("Upload PDF", type="pdf", accept_multiple_files=False)
@@ -48,7 +50,7 @@ if question:
 
     # Generate response with Cohere
     with st.chat_message("assistant"):
-        cohere_client = cohere.Client(cohere_api)
+        cohere_client = Cohere(COHERE_API_KEY)  # Using Cohere from langchain_community.llms
         cohere_response = cohere_client.generate(
             model='xlarge',
             prompt=prompt_template.format(pdf_extract=pdf_extract),
