@@ -1,9 +1,12 @@
 langchain
 pypdf
-tiktoken
-databutton
 cohere
 python-dotenv
 langchain-community
 PyPDF2
 pinecone-client
+numpy 
+pandas
+streamlit
+google.generativeai
+pinecone

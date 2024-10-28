@@ -1,5 +1,5 @@
 # PDF RAG Chatbot
-##Overview
+## Overview
 This project implements a Retrieval-Augmented Generation (RAG) chatbot that allows users to upload a PDF file, ask questions based on the PDF content, and receive coherent, contextually relevant answers. The system integrates Cohere API for generating answers and Pinecone for efficient document embedding storage and retrieval.
 
 ## Features
